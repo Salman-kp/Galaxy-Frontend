@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import api from "../../../services/api";
 
-export default function ResetPasswordModal({ userId, onClose }) {
+export default function ResetPasswordModal({ userId, onClose, onSuccess, onError }) {
   const [newPassword, setNewPassword] = useState("");
   if (!userId) return null;
 
@@ -9,8 +9,11 @@ export default function ResetPasswordModal({ userId, onClose }) {
     e.preventDefault();
     try {
       await api.put(`/api/admin/users/reset-password/${userId}`, { new_password: newPassword });
-      alert("Credentials updated"); onClose();
-    } catch (err) { alert("Reset failed"); }
+      if (onSuccess) onSuccess(); 
+      onClose();
+    } catch (err) { 
+      if (onError) onError("Failed to reset password. Please try again.");
+    }
   };
 
   return (
