@@ -19,6 +19,7 @@ export default function AdminSidebar() {
 
   return (
     <>
+      {/* DESKTOP SIDEBAR */}
       <aside className="hidden md:flex w-72 h-full bg-[#0a0a0c] flex-col p-6 border-r border-white/5">
         <div className="flex items-center gap-3 px-2 mb-10">
           <div className="h-9 w-9 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">G</div>
@@ -43,9 +44,16 @@ export default function AdminSidebar() {
       </aside>
 
       {/* MOBILE BOTTOM NAV */}
-      <nav className="md:hidden fixed bottom-4 left-4 right-4 h-16 bg-[#0a0a0c]/95 backdrop-blur-xl border border-white/10 rounded-2xl px-6 flex justify-around items-center z-50">
-        {navItems.slice(0, 4).map((item) => (
-          <NavLink key={item.to} to={item.to} className={({ isActive }) => `p-2 ${isActive ? "text-blue-500" : "text-gray-500"}`}>
+      {/* Removed .slice(0, 4) to show all 5 items including Profile */}
+      <nav className="md:hidden fixed bottom-4 left-4 right-4 h-16 bg-[#0a0a0c]/95 backdrop-blur-xl border border-white/10 rounded-2xl px-2 flex justify-around items-center z-50 shadow-2xl">
+        {navItems.map((item) => (
+          <NavLink 
+            key={item.to} 
+            to={item.to} 
+            className={({ isActive }) => 
+              `p-3 rounded-xl transition-all duration-300 ${isActive ? "text-blue-500 bg-blue-500/10" : "text-gray-500 hover:text-gray-300"}`
+            }
+          >
             <item.icon size={22} />
           </NavLink>
         ))}

@@ -194,7 +194,6 @@ export default function UserFormDrawer({ isOpen, onClose, userData, onSuccess, o
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Access Role</label>
               <select value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="w-full p-3 bg-gray-50 rounded-xl text-xs font-semibold outline-none cursor-pointer border-none focus:ring-2 focus:ring-[#B2DFDB]/20">
-                <option value="admin">Administrator</option>
                 <option value="captain">Captain</option>
                 <option value="sub_captain">Sub Captain</option>
                 <option value="main_boy">Main Boy</option>

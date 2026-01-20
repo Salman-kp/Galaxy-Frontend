@@ -5,6 +5,10 @@ import AdminLayout from "../layouts/AdminLayout";
 import Login from "../pages/Login";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import UserManagement from "../pages/admin/UserManagement";
+import EventManagement from "../pages/admin/EventManagement";
+import RoleWageManagement from "../pages/admin/RoleWageManagement";
+import AdminProfile from "../pages/admin/AdminProfile";
+import EventDetails from "../pages/admin/EventDetails";
 
 function AppRoutes() {
   const { isAuthenticated, role, loading } = useAuth();
@@ -34,9 +38,10 @@ function AppRoutes() {
           <Route element={<AdminLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserManagement />} />
-            <Route path="/admin/events" element={<div>Events Management</div>} />
-            <Route path="/admin/wages" element={<div>Wages Management</div>} />
-            <Route path="/admin/profile" element={<div>Admin Profile</div>} />
+            <Route path="/admin/events" element={<EventManagement />} />
+            <Route path="/admin/events/:id" element={<EventDetails />} />
+            <Route path="/admin/wages" element={<RoleWageManagement/>} />
+            <Route path="/admin/profile" element={<AdminProfile/>} />
           </Route>
         </Route>
 
