@@ -11,14 +11,10 @@ export default function AdminTopbar() {
         {/* USER INFO */}
         <div className="flex items-center gap-4">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-extrabold text-gray-900 leading-none">
-              {user?.name || "Admin"}
-            </p>
-            <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest mt-1 opacity-80">
-              Super Admin
+            <p className="text-sm font-extrabold  text-white leading-none">
+              {user?.name}
             </p>
           </div>
-
           {/* LOGOUT BUTTON */}
           <button 
             onClick={logout}

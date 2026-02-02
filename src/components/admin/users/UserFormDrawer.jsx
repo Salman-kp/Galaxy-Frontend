@@ -19,8 +19,6 @@ export default function UserFormDrawer({ isOpen, onClose, userData, onSuccess, o
   const [photo, setPhoto] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  // 1. CRITICAL FIX: Memory Management for Image Previews
-  // Without this, every time you pick an image, a memory leak occurs.
   useEffect(() => {
     if (!photo) {
       setPreview(null);
@@ -29,18 +27,16 @@ export default function UserFormDrawer({ isOpen, onClose, userData, onSuccess, o
     const objectUrl = URL.createObjectURL(photo);
     setPreview(objectUrl);
     
-    // Cleanup function to free memory when component unmounts or photo changes
     return () => URL.revokeObjectURL(objectUrl);
   }, [photo]);
 
-  // 2. Sync form state with incoming userData
   useEffect(() => {
     if (userData) {
       const formattedDob = userData.dob ? userData.dob.split('T')[0] : "";
       setFormData({ 
         name: userData.name || "",
         phone: userData.phone || "",
-        password: "", // Security: Never fill the password field on edit
+        password: "", 
         role: userData.role || "main_boy",
         branch: userData.branch || "",
         starting_point: userData.starting_point || "",
@@ -57,7 +53,6 @@ export default function UserFormDrawer({ isOpen, onClose, userData, onSuccess, o
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Prepare JSON payload for the backend
     const jsonPayload = {
       name: formData.name,
       phone: formData.phone,
@@ -68,7 +63,6 @@ export default function UserFormDrawer({ isOpen, onClose, userData, onSuccess, o
       dob: formData.dob,
     };
 
-    // Logic: New users need password, existing users need status updates
     if (!userData) {
       jsonPayload.password = formData.password;
     } else {
@@ -76,7 +70,6 @@ export default function UserFormDrawer({ isOpen, onClose, userData, onSuccess, o
     }
 
     const data = new FormData();
-    // Appending the JSON string as expected by your Go backend
     data.append("json", JSON.stringify(jsonPayload));
     
     if (photo) {
@@ -85,11 +78,11 @@ export default function UserFormDrawer({ isOpen, onClose, userData, onSuccess, o
 
     try {
       if (userData) {
-        await api.put(`/api/admin/users/${userData.id}`, data, {
+        await api.put(`/admin/users/${userData.id}`, data, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       } else {
-        await api.post("/api/admin/users", data, {
+        await api.post("/admin/users", data, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       }
@@ -102,17 +95,17 @@ export default function UserFormDrawer({ isOpen, onClose, userData, onSuccess, o
   };
 
   return (
-    <div className={`fixed inset-0 z-[100] flex justify-end bg-black/10 backdrop-blur-[2px] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-      <div className={`w-full max-w-sm bg-white h-screen p-8 shadow-2xl transition-transform duration-300 ease-in-out overflow-y-auto ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+    <div className={`fixed inset-0 z-[100] flex justify-end bg-black/60 backdrop-blur-[2px] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      <div className={`w-full max-w-sm bg-[#0a0a0c] h-screen p-8 shadow-2xl border-l border-white/10 transition-transform duration-300 ease-in-out overflow-y-auto ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-xl font-bold tracking-tight">
-            {userData ? `Edit Details: ${userData.name}` : 'Create New User'}
+          <h2 className="text-xl italic md:text-1xl font-bold tracking-tight text-white uppercase">
+            {userData ? `Edit: ${userData.name}` : 'Create New User'}
           </h2>
           <button 
             type="button"
             onClick={onClose} 
-            className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400 hover:text-gray-900"
+            className="p-2 hover:bg-white/5 rounded-xl transition-colors text-gray-500 hover:text-white"
           >
             <X size={20}/>
           </button>
@@ -121,15 +114,15 @@ export default function UserFormDrawer({ isOpen, onClose, userData, onSuccess, o
         <form onSubmit={handleSubmit} className="space-y-5 pb-10">
           {/* Avatar Upload Section */}
           <div className="flex justify-center mb-6">
-            <div className="relative h-24 w-24 rounded-full bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden hover:border-[#B2DFDB] transition-all cursor-pointer group shadow-sm">
+            <div className="relative h-24 w-24 rounded-full bg-[#161B26] border-2 border-dashed border-blue-600/50 flex items-center justify-center overflow-hidden hover:border-blue-500 transition-all cursor-pointer group shadow-sm">
               {preview ? (
                 <img src={preview} className="h-full w-full object-cover" alt="preview" />
               ) : userData?.photo ? (
-                <img src={`http://localhost:8080/uploads/${userData.photo}`} className="h-full w-full object-cover" alt="profile" />
+                <img src={`http://localhost:8080/uploads/${userData.photo}`} className="h-full w-full object-cover opacity-80" alt="profile" />
               ) : (
                 <div className="flex flex-col items-center">
-                   <Camera className="text-gray-300 group-hover:text-[#B2DFDB] transition-colors" size={28} />
-                   <span className="text-[8px] font-bold text-gray-300 uppercase mt-1">Upload</span>
+                   <Camera className="text-gray-500 group-hover:text-blue-500 transition-colors" size={28} />
+                   <span className="text-[8px] font-bold text-gray-500 uppercase mt-1">Upload</span>
                 </div>
               )}
               <input 
@@ -144,70 +137,71 @@ export default function UserFormDrawer({ isOpen, onClose, userData, onSuccess, o
           <div className="space-y-4">
             {/* Name Input */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
-              <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full p-3 bg-gray-50 rounded-xl border-none font-medium text-xs focus:ring-2 focus:ring-[#B2DFDB]/20 outline-none transition-all" placeholder="Enter name" required />
+              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Full Name</label>
+              <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full p-3 bg-[#161B26] rounded-xl border border-white/5 text-white font-medium text-xs focus:ring-2 focus:ring-blue-600/40 focus:border-blue-600 outline-none transition-all" placeholder="Enter name" required />
             </div>
             
             {/* Phone Input */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
-              <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full p-3 bg-gray-50 rounded-xl border-none font-medium text-xs focus:ring-2 focus:ring-[#B2DFDB]/20 outline-none transition-all" placeholder="10-digit mobile" required />
+              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Phone Number</label>
+              <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full p-3 bg-[#161B26] rounded-xl border border-white/5 text-white font-medium text-xs focus:ring-2 focus:ring-blue-600/40 focus:border-blue-600 outline-none transition-all" placeholder="10-digit mobile" required />
             </div>
 
             {/* Password - Only shown on Create */}
             {!userData && (
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Initial Password</label>
-                <input type="password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full p-3 bg-gray-50 rounded-xl border-none font-medium text-xs focus:ring-2 focus:ring-[#B2DFDB]/20 outline-none transition-all" placeholder="Security key" required />
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Initial Password</label>
+                <input type="password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full p-3 bg-[#161B26] rounded-xl border border-white/5 text-white font-medium text-xs focus:ring-2 focus:ring-blue-600/40 focus:border-blue-600 outline-none transition-all" placeholder="Security key" required />
               </div>
             )}
 
             {/* Branch & Starting Point */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Branch</label>
-                <input type="text" value={formData.branch} onChange={e => setFormData({...formData, branch: e.target.value})} className="w-full p-3 bg-gray-50 rounded-xl border-none font-medium text-xs focus:ring-2 focus:ring-[#B2DFDB]/20 outline-none" placeholder="Location" />
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Branch</label>
+                <input type="text" value={formData.branch} onChange={e => setFormData({...formData, branch: e.target.value})} className="w-full p-3 bg-[#161B26] rounded-xl border border-white/5 text-white font-medium text-xs focus:ring-2 focus:ring-blue-600/40 outline-none" placeholder="Location" />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Starting Point</label>
-                <input type="text" value={formData.starting_point} onChange={e => setFormData({...formData, starting_point: e.target.value})} className="w-full p-3 bg-gray-50 rounded-xl border-none font-medium text-xs focus:ring-2 focus:ring-[#B2DFDB]/20 outline-none" placeholder="City" />
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Starting Point</label>
+                <input type="text" value={formData.starting_point} onChange={e => setFormData({...formData, starting_point: e.target.value})} className="w-full p-3 bg-[#161B26] rounded-xl border border-white/5 text-white font-medium text-xs focus:ring-2 focus:ring-blue-600/40 outline-none" placeholder="City" />
               </div>
             </div>
 
             {/* Blood Group & DOB */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Blood Group</label>
-                <select value={formData.blood_group} onChange={e => setFormData({...formData, blood_group: e.target.value})} className="w-full p-3 bg-gray-50 rounded-xl text-xs font-semibold outline-none cursor-pointer border-none focus:ring-2 focus:ring-[#B2DFDB]/20">
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Blood Group</label>
+                <select value={formData.blood_group} onChange={e => setFormData({...formData, blood_group: e.target.value})} className="w-full p-3 bg-[#161B26] rounded-xl text-xs font-semibold text-white outline-none cursor-pointer border border-white/5 focus:ring-2 focus:ring-blue-600/40">
                   {["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map(bg => (
-                    <option key={bg} value={bg}>{bg}</option>
+                    <option key={bg} value={bg} className="bg-[#161B26]">{bg}</option>
                   ))}
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Date of Birth</label>
-                <input type="date" value={formData.dob} onChange={e => setFormData({...formData, dob: e.target.value})} className="w-full p-3 bg-gray-50 rounded-xl border-none font-medium text-xs focus:ring-2 focus:ring-[#B2DFDB]/20 outline-none" />
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Date of Birth</label>
+                <input type="date" value={formData.dob} onChange={e => setFormData({...formData, dob: e.target.value})} className="w-full p-3 bg-[#161B26] rounded-xl border border-white/5 text-white font-medium text-xs focus:ring-2 focus:ring-blue-600/40 outline-none" style={{ colorScheme: 'dark' }} />
               </div>
             </div>
 
             {/* Role Selection */}
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Access Role</label>
-              <select value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="w-full p-3 bg-gray-50 rounded-xl text-xs font-semibold outline-none cursor-pointer border-none focus:ring-2 focus:ring-[#B2DFDB]/20">
-                <option value="captain">Captain</option>
-                <option value="sub_captain">Sub Captain</option>
-                <option value="main_boy">Main Boy</option>
-                <option value="junior_boy">Junior Boy</option>
+              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Access Role</label>
+              <select value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="w-full p-3 bg-[#161B26] rounded-xl text-xs font-semibold text-white outline-none cursor-pointer border border-white/5 focus:ring-2 focus:ring-blue-600/40">
+               <option value="admin" disabled className="bg-[#161B26]">Admin</option>
+                <option value="captain" className="bg-[#161B26]">Captain</option>
+                <option value="sub_captain" className="bg-[#161B26]">Sub Captain</option>
+                <option value="main_boy" className="bg-[#161B26]">Main Boy</option>
+                <option value="junior_boy" className="bg-[#161B26]">Junior Boy</option>
               </select>
             </div>
 
             {/* Status Selection - Only shown on Edit */}
             {userData && (
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Account Status</label>
-                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full p-3 bg-gray-50 rounded-xl text-xs font-semibold outline-none cursor-pointer border-none focus:ring-2 focus:ring-[#B2DFDB]/20">
-                  <option value="active">Active</option>
-                  <option value="blocked">Blocked / Suspended</option>
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Account Status</label>
+                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full p-3 bg-[#161B26] rounded-xl text-xs font-semibold text-white outline-none cursor-pointer border border-white/5 focus:ring-2 focus:ring-blue-600/40">
+                  <option value="active" className="bg-[#161B26] text-emerald-400">Active</option>
+                  <option value="blocked" className="bg-[#161B26] text-rose-400">Blocked / Suspended</option>
                 </select>
               </div>
             )}
@@ -215,7 +209,7 @@ export default function UserFormDrawer({ isOpen, onClose, userData, onSuccess, o
 
           <button 
             type="submit" 
-            className="w-full py-4 bg-[#1A1A1A] text-white rounded-xl font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-black active:scale-[0.98] transition-all mt-6 shadow-lg shadow-gray-200"
+            className="w-full py-4 bg-blue-600 text-white rounded-xl font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-blue-500 active:scale-[0.98] transition-all mt-6 shadow-lg shadow-blue-900/20"
           >
             {userData ? 'Save Changes' : 'Register Member'}
           </button>

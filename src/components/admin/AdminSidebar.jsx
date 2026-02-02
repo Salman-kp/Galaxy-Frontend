@@ -1,14 +1,22 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, CalendarDays, Wallet, User, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Users, CalendarDays, Wallet, User, ChevronRight, ShieldCheck } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 export default function AdminSidebar() {
+  const { hasPermission } = useAuth();
+
   const navItems = [
-    { to: "/admin/dashboard", icon: LayoutDashboard, label: "Overview" },
-    { to: "/admin/users", icon: Users, label: "Staff Members" },
-    { to: "/admin/events", icon: CalendarDays, label: "Event Schedule" },
-    { to: "/admin/wages", icon: Wallet, label: "Payroll" },
+    { to: "/admin/dashboard", icon: LayoutDashboard, label: "Overview", permission: "dashboard:view" },
+    { to: "/admin/users", icon: Users, label: "Staff Members", permission: "user:view" },
+    { to: "/admin/events", icon: CalendarDays, label: "Event Schedule", permission: "event:view" },
+    { to: "/admin/wages", icon: Wallet, label: "Wage Mangment", permission: "managewages:view" },
+    { to: "/admin/rbac", icon: ShieldCheck, label: "Access Control", permission: "rbac:view" },
     { to: "/admin/profile", icon: User, label: "My Account" },
   ];
+
+  const filteredNavItems = navItems.filter(item => 
+    !item.permission || hasPermission(item.permission)
+  );
 
   const linkClass = ({ isActive }) =>
     `group relative flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 ${
@@ -31,7 +39,7 @@ export default function AdminSidebar() {
 
         <nav className="flex-1 space-y-2">
           <p className="px-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-4">Main Menu</p>
-          {navItems.map((item) => (
+          {filteredNavItems.map((item) => (
             <NavLink key={item.to} to={item.to} className={linkClass}>
               <div className="flex items-center gap-3">
                 <item.icon size={20} />
@@ -44,9 +52,8 @@ export default function AdminSidebar() {
       </aside>
 
       {/* MOBILE BOTTOM NAV */}
-      {/* Removed .slice(0, 4) to show all 5 items including Profile */}
       <nav className="md:hidden fixed bottom-4 left-4 right-4 h-16 bg-[#0a0a0c]/95 backdrop-blur-xl border border-white/10 rounded-2xl px-2 flex justify-around items-center z-50 shadow-2xl">
-        {navItems.map((item) => (
+        {filteredNavItems.map((item) => (
           <NavLink 
             key={item.to} 
             to={item.to} 

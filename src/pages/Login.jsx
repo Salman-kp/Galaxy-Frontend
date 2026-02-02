@@ -1,20 +1,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
-import { useAuth } from "../context/AuthContext"; // Integrated AuthContext
+import { useAuth } from "../context/AuthContext"; 
 import EventBg from "../assets/Event.png";
 import EventBgMain from "../assets/EventMain.jpg";
 
 function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth(); // Hook to update global user state
+  const { login } = useAuth();
 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Role Definitions
   const ADMIN_ROLES = ["admin"];
   const CAPTAIN_ROLES = ["captain"];
   const STAFF_ROLES = ["sub_captain", "main_boy", "junior_boy"];
@@ -27,53 +26,62 @@ function Login() {
     return null;
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    if (loading) return;
+ const ADMIN_NAV_ITEMS = [
+    { to: "/admin/dashboard", permission: "dashboard:view" },
+    { to: "/admin/users",     permission: "user:view" },
+    { to: "/admin/events",    permission: "event:view" },
+    { to: "/admin/wages",    permission: "managewages:view" },
+    { to: "/admin/rbac",      permission: "rbac:view" },
+    { to: "/admin/profile",   permission: null }, // Always the final fallback
+  ];
 
-    setError("");
-    const validationError = validateForm();
-    if (validationError) {
-      setError(validationError);
-      return;
+const handleLogin = async (e) => {
+  e.preventDefault();
+  if (loading) return;
+
+  setError("");
+  const validationError = validateForm();
+  if (validationError) {
+    setError(validationError);
+    return;
+  }
+
+  try {
+    setLoading(true);
+    const res = await api.post("/auth/login", {
+      phone: phone.trim(),
+      password,
+    });
+
+    const userData = res?.data?.user;
+    if (!userData || !userData.role) {
+      throw new Error("Invalid response from server");
     }
+    login(userData);
 
-    try {
-      setLoading(true);
-
-      const res = await api.post("/api/auth/admin/login", {
-        phone: phone.trim(),
-        password,
+    if (ADMIN_ROLES.includes(userData.role)) {
+        const userPermissions = userData.permissions || [];
+        const firstAllowedItem = ADMIN_NAV_ITEMS.find((item) => {
+        return !item.permission || userPermissions.includes(item.permission);
       });
-
-      // Backend response expected: { user: { id, name, role } }
-      const user = res?.data?.user;
       
-      if (!user || !user.role) {
-        throw new Error("Invalid response from server");
-      }
+      const targetPath = firstAllowedItem ? firstAllowedItem.to : "/admin/profile";
+      navigate(targetPath);
 
-      // 1. Update Global State & LocalStorage
-      login(user);
-
-      // 2. Role-Based Redirection
-      if (ADMIN_ROLES.includes(user.role)) {
-        navigate("/admin/dashboard");
-      } else if (CAPTAIN_ROLES.includes(user.role)) {
-        navigate("/captain/dashboard");
-      } else if (STAFF_ROLES.includes(user.role)) {
-        navigate("/staff/dashboard");
-      } else {
-        setError("Unauthorized role access.");
-      }
-    } catch (err) {
-      // Prioritize backend error message, fallback to generic
-      const serverError = err?.response?.data?.error || err?.response?.data?.message;
-      setError(serverError || "Invalid phone number or password.");
-    } finally {
-      setLoading(false);
+    } else if (CAPTAIN_ROLES.includes(userData.role)) {
+      navigate("/captain/dashboard");
+    } else if (STAFF_ROLES.includes(userData.role)) {
+      navigate("/staff/dashboard");
+    } else {
+      setError("Role not recognized for dashboard access.");
     }
-  };
+  } catch (err) {
+    const serverError = err?.response?.data?.error || err?.response?.data?.message;
+    setError(serverError || "Invalid phone number or password.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import api from "../services/api";
 
 const AuthContext = createContext(null);
@@ -8,11 +8,15 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initializeAuth = async () => {
+    const initializeAuth = () => {
       const storedUser = localStorage.getItem("galaxy_user");
       if (storedUser) {
         try {
-          setUser(JSON.parse(storedUser));
+          const parsedUser = JSON.parse(storedUser);
+          setUser({
+            ...parsedUser,
+            permissions: parsedUser.permissions || []
+          });
         } catch (e) {
           localStorage.removeItem("galaxy_user");
         }
@@ -23,25 +27,53 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (userData) => {
-    localStorage.setItem("galaxy_user", JSON.stringify(userData));
-    setUser(userData);
+    const userToStore = {
+      id: userData.id,
+      name: userData.name,
+      role: userData.role,
+    };
+
+    if (userData.permissions && Array.isArray(userData.permissions) && userData.permissions.length > 0) {
+      userToStore.permissions = userData.permissions;
+    }
+
+    localStorage.setItem("galaxy_user", JSON.stringify(userToStore));
+    
+    setUser({
+      ...userToStore,
+      permissions: userToStore.permissions || []
+    });
   };
 
   const logout = async () => {
     try {
       await api.post("/auth/logout");
+    } catch (err) {
+      console.error(err);
     } finally {
       localStorage.removeItem("galaxy_user");
       setUser(null);
-      window.location.href = "/login";
+      window.location.replace("/login");
     }
   };
 
-  const value = { user, isAuthenticated: !!user, role: user?.role || null, login, logout, loading };
+  const hasPermission = useCallback((permissionSlug) => {
+    return user?.permissions?.includes(permissionSlug) || false;
+  }, [user]);
+
+  const value = { 
+    user, 
+    isAuthenticated: !!user, 
+    role: user?.role || null, 
+    permissions: user?.permissions || [],
+    hasPermission,
+    login, 
+    logout, 
+    loading 
+  };
 
   return (
     <AuthContext.Provider value={value}>
-      {/* Prevents route flickering during storage check */}
       {!loading && children}
     </AuthContext.Provider>
   );

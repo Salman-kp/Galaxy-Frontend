@@ -9,18 +9,24 @@ import EventManagement from "../pages/admin/EventManagement";
 import RoleWageManagement from "../pages/admin/RoleWageManagement";
 import AdminProfile from "../pages/admin/AdminProfile";
 import EventDetails from "../pages/admin/EventDetails";
+import RBACManagement from "../pages/admin/RBACManagement";
 
 function AppRoutes() {
-  const { isAuthenticated, role, loading } = useAuth();
-
-  // 1. IMPORTANT: Prevent redirect loops while loading auth state
+  const { isAuthenticated, role, hasPermission, loading } = useAuth();
   if (loading) {
     return <div className="h-screen flex items-center justify-center font-bold">Loading Galaxy...</div>;
   }
 
-  const getRedirectPath = (userRole) => {
-    if (userRole === "admin") return "/admin/dashboard";
-    if (userRole === "captain") return "/captain/dashboard";
+  const getRedirectPath = () => {
+    if (role === "admin") {
+      if (hasPermission("dashboard:view")) return "/admin/dashboard";
+      if (hasPermission("user:view"))      return "/admin/users";
+      if (hasPermission("event:view"))     return "/admin/events";
+      if (hasPermission("rbac:view"))      return "/admin/rbac";
+      if (hasPermission("managewages:view")) return "/admin/wages";
+      return "/admin/profile";
+    }
+    if (role === "captain") return "/captain/dashboard";
     return "/staff/dashboard";
   };
 
@@ -30,18 +36,19 @@ function AppRoutes() {
         {/* PUBLIC ROUTES */}
         <Route 
           path="/login" 
-          element={isAuthenticated ? <Navigate to={getRedirectPath(role)} replace /> : <Login />} 
+          element={isAuthenticated ? <Navigate to={getRedirectPath()} replace /> : <Login />} 
         />
 
         {/* ADMIN ROUTES */}
         <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
           <Route element={<AdminLayout />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<UserManagement />} />
-            <Route path="/admin/events" element={<EventManagement />} />
-            <Route path="/admin/events/:id" element={<EventDetails />} />
-            <Route path="/admin/wages" element={<RoleWageManagement/>} />
-            <Route path="/admin/profile" element={<AdminProfile/>} />
+            <Route path="/admin/dashboard" element={hasPermission("dashboard:view") ? <AdminDashboard /> : <Navigate to={getRedirectPath()} replace />} />
+            <Route path="/admin/users" element={hasPermission("user:view") ? <UserManagement /> : <Navigate to={getRedirectPath()} replace />} />
+            <Route path="/admin/events" element={hasPermission("event:view") ? <EventManagement /> : <Navigate to={getRedirectPath()} replace />} />
+            <Route path="/admin/events/:id" element={hasPermission("event:view") ? <EventDetails /> : <Navigate to={getRedirectPath()} replace />} />
+            <Route path="/admin/rbac" element={hasPermission("rbac:view") ? <RBACManagement/> : <Navigate to={getRedirectPath()} replace />} />
+            <Route path="/admin/wages" element={hasPermission("managewages:view") ? <RoleWageManagement /> : <Navigate to={getRedirectPath()} replace />} />
+            <Route path="/admin/profile" element={<AdminProfile />} />
           </Route>
         </Route>
 
@@ -57,7 +64,7 @@ function AppRoutes() {
         {/* ROOT REDIRECT */}
         <Route 
           path="/" 
-          element={isAuthenticated ? <Navigate to={getRedirectPath(role)} replace /> : <Navigate to="/login" replace />} 
+          element={isAuthenticated ? <Navigate to={getRedirectPath()} replace /> : <Navigate to="/login" replace />} 
         />
 
         {/* FALLBACK */}

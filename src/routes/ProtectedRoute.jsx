@@ -2,10 +2,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function ProtectedRoute({ allowedRoles }) {
-  const { user, loading, isAuthenticated } = useAuth();
-
-  // DEBUG: Check what the app sees when you try to access the route
-  console.log("Auth State:", { isAuthenticated, role: user?.role, loading });
+  const {loading, isAuthenticated, role } = useAuth(); 
 
   if (loading) {
     return (
@@ -19,9 +16,10 @@ function ProtectedRoute({ allowedRoles }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user?.role)) {
-    console.warn("Access Denied: Role mismatch");
-    return <Navigate to="/login" replace />;
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    if (role === 'admin') return <Navigate to="/admin/dashboard" replace />;
+    if (role === 'captain') return <Navigate to="/captain/dashboard" replace />;
+    return <Navigate to="/staff/dashboard" replace />;
   }
 
   return <Outlet />;
