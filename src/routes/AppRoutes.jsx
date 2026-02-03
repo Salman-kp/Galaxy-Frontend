@@ -10,6 +10,14 @@ import RoleWageManagement from "../pages/admin/RoleWageManagement";
 import AdminProfile from "../pages/admin/AdminProfile";
 import EventDetails from "../pages/admin/EventDetails";
 import RBACManagement from "../pages/admin/RBACManagement";
+import CaptainLayout from "../layouts/CaptainLayout";
+import CaptainDashboard from "../pages/captain/CaptainDashboard";
+import OngoingEvents from "../pages/captain/OngoingEvents";
+import BookedEvents from "../pages/captain/BookedEvents";
+import CompletedEvents from "../pages/captain/CompletedEvents";
+import CaptainProfile from "../pages/captain/CaptainProfile";
+import BookingPage from "../pages/captain/BookingPage";
+import CaptainEventDetails from "../pages/captain/CaptainEventDetails";
 
 function AppRoutes() {
   const { isAuthenticated, role, hasPermission, loading } = useAuth();
@@ -52,9 +60,17 @@ function AppRoutes() {
           </Route>
         </Route>
 
-        {/* OTHER ROLES */}
+       {/* CAPTAIN ROUTES */}
         <Route element={<ProtectedRoute allowedRoles={["captain"]} />}>
-          <Route path="/captain/dashboard" element={<div>Captain Dashboard</div>} />
+          <Route element={<CaptainLayout />}>
+            <Route path="/captain/dashboard" element={<CaptainDashboard />} />
+            <Route path="/captain/book/:id" element={<BookingPage />} />
+            <Route path="/captain/events/:id" element={<CaptainEventDetails />} />
+            <Route path="/captain/ongoing" element={<OngoingEvents />} />
+            <Route path="/captain/booked" element={<BookedEvents />} />
+            <Route path="/captain/completed" element={<CompletedEvents />} />
+            <Route path="/captain/profile" element={<CaptainProfile />} />
+          </Route>
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={["sub_captain", "main_boy", "junior_boy"]} />}>
