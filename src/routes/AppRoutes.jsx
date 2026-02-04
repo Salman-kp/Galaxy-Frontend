@@ -18,6 +18,13 @@ import CompletedEvents from "../pages/captain/CompletedEvents";
 import CaptainProfile from "../pages/captain/CaptainProfile";
 import BookingPage from "../pages/captain/BookingPage";
 import CaptainEventDetails from "../pages/captain/CaptainEventDetails";
+import WorkersProfile from "../pages/workers/WorkersProfile";
+import WorkersLayout from "../layouts/WorkersLayout";
+import WorkersDashboard from "../pages/workers/WorkersDashboard";
+import WorkersBookingPage from "../pages/workers/WorkersBookingPage";
+import WorkersEventDetails from "../pages/workers/WorkersEventDetails";
+import WorkersBookedEvents from "../pages/workers/WorkersBookedEvents";
+import WorkersCompletedEvents from "../pages/workers/WorkersCompletedEvents";
 
 function AppRoutes() {
   const { isAuthenticated, role, hasPermission, loading } = useAuth();
@@ -35,7 +42,7 @@ function AppRoutes() {
       return "/admin/profile";
     }
     if (role === "captain") return "/captain/dashboard";
-    return "/staff/dashboard";
+    return "/worker/dashboard";
   };
 
   return (
@@ -74,7 +81,14 @@ function AppRoutes() {
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={["sub_captain", "main_boy", "junior_boy"]} />}>
-          <Route path="/staff/dashboard" element={<div>Staff Dashboard</div>} />
+          <Route element={<WorkersLayout />}>
+            <Route path="/worker/dashboard" element={<WorkersDashboard />} />
+            <Route path="/worker/book/:id" element={<WorkersBookingPage />} />
+            <Route path="/worker/event/:id" element={<WorkersEventDetails />} />
+            <Route path="/worker/booked-events" element={<WorkersBookedEvents />} />
+            <Route path="/worker/completed-events" element={<WorkersCompletedEvents />} />
+            <Route path="/worker/profile" element={<WorkersProfile />} />
+          </Route>
         </Route>
 
         {/* ROOT REDIRECT */}

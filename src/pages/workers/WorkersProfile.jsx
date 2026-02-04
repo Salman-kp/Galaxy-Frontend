@@ -11,7 +11,7 @@ import {
   Wallet,
 } from "lucide-react";
 
-export default function CaptainProfile() {
+export default function WorkersProfile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -32,7 +32,7 @@ export default function CaptainProfile() {
   if (loading)
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center">
-        <Loader2 className="animate-spin text-red-600 mb-3" size={30} />
+        <Loader2 className="animate-spin text-yellow-600 mb-3" size={30} />
         <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">
           Loading Profile
         </span>
@@ -41,7 +41,7 @@ export default function CaptainProfile() {
 
   if (!profile)
     return (
-      <div className="p-10 text-center text-red-600 font-bold">
+      <div className="p-10 text-center text-yellow-600 font-bold">
         Failed to load profile
       </div>
     );
@@ -51,7 +51,7 @@ export default function CaptainProfile() {
       {/* ================= PROFILE CARD ================= */}
       <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
         {/* TOP SECTION */}
-        <div className="p-14 bg-gradient-to-br from-red-600 to-red-800 h-40">
+        <div className="p-14 bg-gradient-to-br from-yellow-600 to-yellow-800 h-40">
           <div className=" bottom-16 left-8">
             <img
               src={
@@ -70,7 +70,7 @@ export default function CaptainProfile() {
           <h2 className="text-2xl font-black tracking-tight capitalize">
             {profile.name}
           </h2>
-          <p className="text-sm font-bold text-red-600 uppercase tracking-wide">
+          <p className="text-sm font-bold text-yellow-600 uppercase tracking-wide">
             {profile.role}
           </p>
           <p className="text-xs font-semibold text-gray-400 mt-1">
@@ -102,7 +102,7 @@ export default function CaptainProfile() {
           />
           <InfoItem
             icon={Wallet}
-            label="Current Wage"
+            label="Today's Wage"
             value={`₹${profile.current_wage || "0.00"}`}
           />
           <InfoItem
@@ -124,7 +124,7 @@ export default function CaptainProfile() {
 function InfoItem({ icon: Icon, label, value }) {
   return (
     <div className="flex items-start gap-4 bg-gray-50 rounded-2xl p-4">
-      <div className="h-10 w-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-red-600">
+      <div className="h-10 w-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-yellow-600">
         <Icon size={18} />
       </div>
       <div>
