@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext"; 
 import EventBg from "../assets/Event.png";
 import EventBgMain from "../assets/EventMain.jpg";
+import EventBgMobile from "../assets/EventBgMobile.jpg";
 
 function Login() {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [bgImage, setBgImage] = useState(EventBgMain);
 
   const ADMIN_ROLES = ["admin"];
   const CAPTAIN_ROLES = ["captain"];
@@ -34,6 +36,20 @@ function Login() {
     { to: "/admin/rbac",      permission: "rbac:view" },
     { to: "/admin/profile",   permission: null }, // Always the final fallback
   ];
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setBgImage(EventBgMobile);
+      } else {
+        setBgImage(EventBgMain);
+      }
+    };
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
 const handleLogin = async (e) => {
   e.preventDefault();
@@ -85,26 +101,25 @@ const handleLogin = async (e) => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4 bg-cover bg-center relative"
-      style={{ backgroundImage: `url(${EventBgMain})` }}
+      className="min-h-screen flex items-center justify-center px-4 bg-cover bg-center relative transition-all duration-500"
+      style={{ backgroundImage: `url(${bgImage})` }}
     >
       <div className="absolute inset-0 bg-black/60" />
 
       <div className="relative z-10 w-full max-w-md sm:max-w-lg lg:max-w-4xl grid grid-cols-1 lg:grid-cols-2 rounded-xl overflow-hidden shadow-2xl">
         <div
-          className="relative p-5 sm:p-8 lg:p-10 flex flex-col justify-center bg-white/70 backdrop-blur-xl lg:bg-white lg:backdrop-blur-0"
-          style={{
-            backgroundImage: `url(${EventBg})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          <div className="absolute inset-0 bg-white/70 lg:bg-white" />
+        className="relative p-5 sm:p-8 lg:p-10 flex flex-col justify-center 
+         /* Mobile: Transparent/Glassy */
+          bg-transparent backdrop-blur-none
+         /* Desktop: Solid White + Background Image */
+        lg:bg-white lg:backdrop-blur-0 lg:bg-[url('/src/assets/Event.png')] lg:bg-cover lg:bg-center"
+         >
+          <div className="absolute inset-0 bg-white/30 lg:bg-white" />
           <div className="relative z-10">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight mb-1">
               Get started now
             </h1>
-            <p className="text-sm text-gray-700 mb-6 sm:mb-8">
+            <p className="text-sm text-gray-800 mb-6 sm:mb-8">
               Sign in to continue to Galaxy Event Management
             </p>
 
@@ -128,7 +143,7 @@ const handleLogin = async (e) => {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
                   placeholder="Enter phone number"
-                  className="w-full border-b border-black/40 bg-transparent py-2 text-sm focus:outline-none focus:border-black disabled:opacity-60"
+                  className="w-full  border-b border-black/40 bg-transparent py-2 text-sm focus:outline-none focus:border-black disabled:opacity-60"
                 />
               </div>
 
