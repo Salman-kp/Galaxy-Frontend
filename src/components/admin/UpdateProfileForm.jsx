@@ -118,23 +118,40 @@ export default function UpdateProfileForm({ currentData, onClose, onRefresh }) {
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           
           <div className="flex justify-center">
-             <label className="relative cursor-pointer group">
-               <div className="w-20 h-20 rounded-2xl border border-white/10 flex items-center justify-center overflow-hidden bg-[#0F172A] relative transition-all group-hover:border-blue-500">
-                 {preview ? (
-                   <img src={preview} className="w-full h-full object-cover" alt="Preview" />
-                 ) : (
-                   <img 
-                    src={currentData?.photo ? `http://localhost:8080/uploads/users/${currentData.photo}` : `https://ui-avatars.com/api/?background=3b82f6&color=fff&name=${currentData?.name}`} 
+            <label className="relative cursor-pointer group">
+                <div className="w-20 h-20 rounded-2xl border border-white/10 flex items-center justify-center overflow-hidden bg-[#0F172A] relative transition-all group-hover:border-blue-500">
+                {preview ? (
+                  <img src={preview} className="w-full h-full object-cover" alt="Preview" />
+                ) : currentData?.photo ? (
+                    <img 
+                    src={`http://localhost:8080/uploads/${currentData.photo}`} 
                     className="w-full h-full object-cover" 
-                    alt="Current" 
-                   />
-                 )}
-                 <div className="absolute inset-0 bg-blue-600/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    alt="Current Profile" 
+                    onError={(e) => {
+                         e.target.src = `https://ui-avatars.com/api/?background=3b82f6&color=fff&name=${currentData?.name}`;
+                    }}
+                  />
+                ) : (
+                  <img 
+                    src={`https://ui-avatars.com/api/?background=3b82f6&color=fff&name=${currentData?.name}`} 
+                    className="w-full h-full object-cover" 
+                    alt="Avatar" 
+                  />
+                )}
+                
+                <div className="absolute inset-0 bg-blue-600/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                   <Camera className="text-white" size={20} />
-                 </div>
                 </div>
-                <input type="file" className="hidden" onChange={e => setPhoto(e.target.files[0])} accept="image/*" />
-             </label>
+                </div>
+                <input 
+                type="file" 
+                className="hidden" 
+                onChange={e => {
+                  if (e.target.files[0]) setPhoto(e.target.files[0]);
+                }} 
+                accept="image/*" 
+               />
+            </label>
           </div>
 
           <div className="grid grid-cols-2 gap-3">

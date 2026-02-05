@@ -52,15 +52,6 @@ export default function AdminProfile() {
              <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white uppercase">Profile</h1>
             <p className="text-xs text-gray-500">Manage identity and credentials.</p>
           </div>
-        
-        {hasPermission("profile:edit") && (
-            <button 
-              onClick={() => setShowUpdate(true)}
-              className="flex items-center gap-2 bg-blue-600 text-black hover:bg-gray-200 px-4 py-2 rounded-full text-xs font-bold transition-all active:scale-95"
-            >
-              <Edit3 size={14} /> Edit Profile
-            </button>
-          )}
         </div>
 
         <div className="bg-[#111114] border border-white/5 rounded-2xl overflow-hidden shadow-xl">
@@ -91,6 +82,14 @@ export default function AdminProfile() {
                 <p className="flex items-center gap-1.5 text-xs font-medium">
                   <MapPin size={13} className="text-blue-500" /> {profile.starting_point || "Undisclosed"}
                 </p>
+                {hasPermission("profile:edit") && (
+                <button 
+                onClick={() => setShowUpdate(true)}
+                className="flex items-center gap-2 bg-blue-600 text-black hover:bg-gray-200 px-2 py-2 rounded-full text-xs font-bold transition-all active:scale-95"
+               >
+                <Edit3 size={14} /> 
+               </button>
+               )}
               </div>
             </div>
           </div>
