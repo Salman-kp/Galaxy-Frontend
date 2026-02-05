@@ -25,6 +25,7 @@ import WorkersBookingPage from "../pages/workers/WorkersBookingPage";
 import WorkersEventDetails from "../pages/workers/WorkersEventDetails";
 import WorkersBookedEvents from "../pages/workers/WorkersBookedEvents";
 import WorkersCompletedEvents from "../pages/workers/WorkersCompletedEvents";
+import SystemConfig from "../pages/admin/SystemConfig";
 
 function AppRoutes() {
   const { isAuthenticated, role, hasPermission, loading } = useAuth();
@@ -38,6 +39,7 @@ function AppRoutes() {
       if (hasPermission("user:view"))      return "/admin/users";
       if (hasPermission("event:view"))     return "/admin/events";
       if (hasPermission("rbac:view"))      return "/admin/rbac";
+      if (hasPermission("system:manage")) return "/admin/settings";
       if (hasPermission("managewages:view")) return "/admin/wages";
       return "/admin/profile";
     }
@@ -57,6 +59,7 @@ function AppRoutes() {
         {/* ADMIN ROUTES */}
         <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
           <Route element={<AdminLayout />}>
+            <Route path="/admin/settings" element={hasPermission("system:manage") ? <SystemConfig /> : <Navigate to={getRedirectPath()} replace />} />
             <Route path="/admin/dashboard" element={hasPermission("dashboard:view") ? <AdminDashboard /> : <Navigate to={getRedirectPath()} replace />} />
             <Route path="/admin/users" element={hasPermission("user:view") ? <UserManagement /> : <Navigate to={getRedirectPath()} replace />} />
             <Route path="/admin/events" element={hasPermission("event:view") ? <EventManagement /> : <Navigate to={getRedirectPath()} replace />} />

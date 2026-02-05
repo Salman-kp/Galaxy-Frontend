@@ -8,6 +8,7 @@ import {
   ChevronRight,
   ChevronLeft,
   ShieldCheck,
+  ComputerIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
@@ -21,6 +22,7 @@ export default function AdminSidebar() {
     { to: "/admin/users", icon: Users, label: "Staff Members", permission: "user:view" },
     { to: "/admin/events", icon: CalendarDays, label: "Event Schedule", permission: "event:view" },
     { to: "/admin/wages", icon: Wallet, label: "Wage Management", permission: "managewages:view" },
+    { to: "/admin/settings", icon: ComputerIcon,  label: "System Management", permission: "system:manage" },
     { to: "/admin/rbac", icon: ShieldCheck, label: "Access Control", permission: "rbac:view" },
     { to: "/admin/profile", icon: User, label: "My Account" },
   ];
