@@ -1,14 +1,12 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "/api", 
+  baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
 });
 
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
       const msg = error.response.data.error;
@@ -22,7 +20,7 @@ api.interceptors.response.use(
       if (logoutErrors.includes(msg)) {
         console.warn("Authentication lost:", msg);
         localStorage.removeItem("galaxy_user");
-        
+
         if (window.location.pathname !== "/login") {
           window.location.href = "/login";
         }
