@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import api from "../../services/api";
 import { 
-  User, Phone, MapPin, Droplets, Calendar, 
-  Building2, Edit3, ShieldCheck, Loader2 
+   Phone, MapPin, Droplets, Calendar, 
+  Building2, ShieldCheck, Loader2, 
+  Key
 } from "lucide-react";
 import UpdateProfileForm from "../../components/admin/UpdateProfileForm";
 
@@ -87,7 +88,7 @@ export default function AdminProfile() {
                 onClick={() => setShowUpdate(true)}
                 className="flex items-center gap-2 bg-blue-600 text-black hover:bg-gray-200 px-2 py-2 rounded-full text-xs font-bold transition-all active:scale-95"
                >
-                <Edit3 size={14} /> 
+                <Key size={14} /> 
                </button>
                )}
               </div>

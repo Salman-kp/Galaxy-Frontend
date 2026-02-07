@@ -7,7 +7,6 @@ import {
   Droplets,
   Calendar,
   Briefcase,
-  User,
   Wallet,
 } from "lucide-react";
 

@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { 
   ArrowLeft, Calendar, Clock, MapPin, Briefcase, CheckCircle2,
-  AlertCircle, X, Check, Loader2, Search
+  AlertCircle, X, Check, Loader2, Search,CalendarIcon
 } from "lucide-react";
 import api from "../../services/api";
 
@@ -161,6 +161,7 @@ export default function CaptainEventDetails() {
 
   if (loading) return <div className="p-10 text-center text-slate-500 text-sm bg-slate-950 min-h-screen flex items-center justify-center gap-2"><Loader2 className="animate-spin" size={16}/> Loading event details...</div>;
   if (!event) return <div className="p-10 text-center text-red-400 text-sm bg-slate-950 min-h-screen">Event not found</div>;
+  const isToday = new Date(event.date).toDateString() === new Date().toDateString();
 
   return (
     <div className="font-sans pb-10 min-h-screen ">
@@ -271,55 +272,76 @@ export default function CaptainEventDetails() {
   </div>
 
   {/* Status Management Section */}
-  <div className="flex flex-col md:flex-row md:items-center gap-[1.5vw] border-t border-slate-800 pt-[1.5vw]">
-    <span className="text-[clamp(9px,0.8vw,11px)] font-semibold text-slate-500 uppercase tracking-tight">
-      Manage Event Status:
-    </span>
-    {!pendingStatus ? (
-      <div className="flex gap-2">
-        {(event.status === 'upcoming' || event.status === 'ongoing') ? (
-          <select 
-            value={event.status} 
-            onChange={(e) => setPendingStatus(e.target.value)} 
-            className="bg-slate-800 border border-slate-700 text-slate-200 rounded-lg px-[1vw] py-1 text-[clamp(10px,0.9vw,12px)] font-medium focus:outline-none min-w-[150px] shadow-sm cursor-pointer hover:border-slate-600"
-          >
-            {event.status === 'upcoming' && (
-              <>
-                <option value="upcoming" disabled>Upcoming (Current)</option>
-                <option value="ongoing">Start Event</option>
-                <option value="completed">Mark as Completed</option>
-              </>
-            )}
-            {event.status === 'ongoing' && (
-              <>
-                <option value="ongoing" disabled>Ongoing (In Progress)</option>
-                <option value="completed">Finish & Complete Event</option>
-              </>
-            )}
-          </select>
-        ) : (
-          <div className="flex items-center gap-2 text-slate-500 italic text-[clamp(10px,0.9vw,12px)]">
-            <CheckCircle2 className="w-[1.2vw] h-[1.2vw] min-w-[12px]" /> Event is {event.status}.
-          </div>
-        )}
-      </div>
-    ) : (
-      <div className="flex items-center gap-[1vw] animate-in fade-in slide-in-from-left-2 duration-300">
-        <div className="flex items-center gap-1.5 bg-amber-900/20 border border-amber-800/50 px-[1vw] py-1 rounded-lg shadow-sm">
-          <AlertCircle className="text-amber-500 w-[1.2vw] h-[1.2vw] min-w-[12px]" />
-          <span className="text-[clamp(9px,0.8vw,11px)] text-amber-500 font-bold uppercase tracking-tight">
-            Confirm "{pendingStatus}"?
-          </span>
+<div className="flex flex-col md:flex-row md:items-center gap-[1.5vw] border-t border-slate-800 pt-[1.5vw]">
+  <span className="text-[clamp(9px,0.8vw,11px)] font-semibold text-slate-500 uppercase tracking-tight">
+    Manage Event Status:
+  </span>
+
+  {/* 1. Date Check: Only allow changes if the date is today */}
+  { event.status !== 'completed' && new Date(event.date).toDateString() === new Date().toDateString() ? (
+    <>
+      {!pendingStatus ? (
+        <div className="flex gap-2">
+          {(event.status === 'upcoming' || event.status === 'ongoing') ? (
+            <select 
+              value={event.status} 
+              onChange={(e) => setPendingStatus(e.target.value)} 
+              className="bg-slate-800 border border-slate-700 text-slate-200 rounded-lg px-[1vw] py-1 text-[clamp(10px,0.9vw,12px)] font-medium focus:outline-none min-w-[150px] shadow-sm cursor-pointer hover:border-slate-600"
+            >
+              {event.status === 'upcoming' && (
+                <>
+                  <option value="upcoming" disabled>Upcoming (Current)</option>
+                  <option value="ongoing">Start Event</option>
+                  <option value="completed">Mark as Completed</option>
+                </>
+              )}
+              {event.status === 'ongoing' && (
+                <>
+                  <option value="ongoing" disabled>Ongoing (In Progress)</option>
+                  <option value="completed">Finish & Complete Event</option>
+                </>
+              )}
+            </select>
+          ) : (
+            <div className="flex items-center gap-2 text-slate-500 italic text-[clamp(10px,0.9vw,12px)]">
+              <CheckCircle2 className="w-[1.2vw] h-[1.2vw] min-w-[12px]" /> Event is {event.status}.
+            </div>
+          )}
         </div>
-        <button onClick={confirmEventStatusUpdate} disabled={isUpdating} className="bg-emerald-600 text-white p-[0.5vw] rounded hover:bg-emerald-700 shadow-md">
-          {isUpdating ? <Loader2 className="w-[1.2vw] h-[1.2vw] animate-spin" /> : <Check className="w-[1.2vw] h-[1.2vw]" />}
-        </button>
-        <button onClick={() => setPendingStatus(null)} className="bg-slate-800 border border-slate-700 text-slate-400 p-[0.5vw] rounded hover:bg-slate-700 shadow-sm">
-          <X className="w-[1.2vw] h-[1.2vw]" />
-        </button>
-      </div>
-    )}
-  </div>
+      ) : (
+        <div className="flex items-center gap-[1vw] animate-in fade-in slide-in-from-left-2 duration-300">
+          <div className="flex items-center gap-1.5 bg-amber-900/20 border border-amber-800/50 px-[1vw] py-1 rounded-lg shadow-sm">
+            <AlertCircle className="text-amber-500 w-[1.2vw] h-[1.2vw] min-w-[12px]" />
+            <span className="text-[clamp(9px,0.8vw,11px)] text-amber-500 font-bold uppercase tracking-tight">
+              Confirm "{pendingStatus}"?
+            </span>
+          </div>
+          <button onClick={confirmEventStatusUpdate} disabled={isUpdating} className="bg-emerald-600 text-white p-[0.5vw] rounded hover:bg-emerald-700 shadow-md">
+            {isUpdating ? <Loader2 className="w-[1.2vw] h-[1.2vw] animate-spin" /> : <Check className="w-[1.2vw] h-[1.2vw]" />}
+          </button>
+          <button onClick={() => setPendingStatus(null)} className="bg-slate-800 border border-slate-700 text-slate-400 p-[0.5vw] rounded hover:bg-slate-700 shadow-sm">
+            <X className="w-[1.2vw] h-[1.2vw]" />
+          </button>
+        </div>
+      )}
+    </>
+  ) : (
+    /* Display state for Completed or Wrong Date */
+    <div className="flex items-center gap-2 text-slate-500 italic text-[clamp(10px,0.9vw,12px)]">
+      {event.status === 'completed' ? (
+        <>
+          <CheckCircle2 className="w-[1.2vw] h-[1.2vw] min-w-[12px] text-emerald-500" />
+          <span className="text-emerald-500/80 font-medium">Event Completed</span>
+        </>
+      ) : (
+        <>
+          <CalendarIcon className="w-[1.2vw] h-[1.2vw] min-w-[12px]" />
+          <span>Status management available on {new Date(event.date).toLocaleDateString()}</span>
+        </>
+      )}
+    </div>
+  )}
+</div>
 </div>
 
           <div className="bg-[#0a0a0c] border border-slate-800 rounded-xl overflow-hidden shadow-xl mb-10 w-full">

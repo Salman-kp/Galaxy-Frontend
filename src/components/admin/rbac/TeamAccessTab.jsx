@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { 
   Search, Loader2, RefreshCcw, Save, Trash2, 
-  User, X, Check, ShieldAlert, ChevronLeft, ChevronRight 
+  User, X, Check, ShieldAlert, ChevronLeft, ChevronRight, 
+  Key
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import api from "../../../services/api";
+import ResetPasswordModal from "../users/ResetPasswordModal";
 
 export default function TeamAccessTab({ roles }) {
   const [staff, setStaff] = useState([]);
@@ -14,6 +16,7 @@ export default function TeamAccessTab({ roles }) {
   const [updatingId, setUpdatingId] = useState(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const [pendingChanges, setPendingChanges] = useState({});
+  const [resettingUserId, setResettingUserId] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
@@ -170,6 +173,7 @@ export default function TeamAccessTab({ roles }) {
                   handleUpdate={handleUpdate}
                   handleDelete={handleDelete}
                   setDeleteConfirmId={setDeleteConfirmId}
+                  onResetPassword={() => setResettingUserId(member.id)}
                 />
               ))}
             </tbody>
@@ -195,6 +199,7 @@ export default function TeamAccessTab({ roles }) {
               handleUpdate={handleUpdate}
               handleDelete={handleDelete}
               setDeleteConfirmId={setDeleteConfirmId}
+              onResetPassword={() => setResettingUserId(member.id)}
             />
           ))}
         </div>
@@ -239,12 +244,23 @@ export default function TeamAccessTab({ roles }) {
           </div>
         )}
       </div>
+      {/* --- Reset Password Modal --- */}
+      {resettingUserId && (
+        <ResetPasswordModal
+          userId={resettingUserId}
+          onClose={() => setResettingUserId(null)}
+          onSuccess={() => {
+            toast.success("Password reset successful");
+          }}
+          onError={(msg) => toast.error(msg)}
+        />
+      )}
     </div>
   );
 }
 
 // Sub-components for cleaner structure
-const DesktopRow = ({ member, pendingChanges, mainRoles, roles, updatingId, deleteConfirmId, handleLocalChange, handleUpdate, handleDelete, setDeleteConfirmId }) => {
+const DesktopRow = ({ member, pendingChanges, mainRoles, roles, updatingId, deleteConfirmId, handleLocalChange, handleUpdate, handleDelete, setDeleteConfirmId,onResetPassword }) => {
   const hasChanges = !!pendingChanges[member.id];
   const currentRole = pendingChanges[member.id]?.role || member.role;
   const currentSubRole = pendingChanges[member.id]?.admin_role_id ?? (member.admin_role_id || "");
@@ -297,13 +313,14 @@ const DesktopRow = ({ member, pendingChanges, mainRoles, roles, updatingId, dele
           member={member} hasChanges={hasChanges} updatingId={updatingId} 
           deleteConfirmId={deleteConfirmId} handleUpdate={handleUpdate} 
           handleDelete={handleDelete} setDeleteConfirmId={setDeleteConfirmId} 
+          onResetPassword={onResetPassword}
         />
       </td>
     </tr>
   );
 };
 
-const MobileCard = ({ member, pendingChanges, mainRoles, roles, updatingId, deleteConfirmId, handleLocalChange, handleUpdate, handleDelete, setDeleteConfirmId }) => {
+const MobileCard = ({ member, pendingChanges, mainRoles, roles, updatingId, deleteConfirmId, handleLocalChange, handleUpdate, handleDelete, setDeleteConfirmId ,onResetPassword }) => {
   const hasChanges = !!pendingChanges[member.id];
   const currentRole = pendingChanges[member.id]?.role || member.role;
   const currentSubRole = pendingChanges[member.id]?.admin_role_id ?? (member.admin_role_id || "");
@@ -324,6 +341,7 @@ const MobileCard = ({ member, pendingChanges, mainRoles, roles, updatingId, dele
           member={member} hasChanges={hasChanges} updatingId={updatingId} 
           deleteConfirmId={deleteConfirmId} handleUpdate={handleUpdate} 
           handleDelete={handleDelete} setDeleteConfirmId={setDeleteConfirmId} 
+          onResetPassword={onResetPassword}
         />
       </div>
 
@@ -364,8 +382,16 @@ const MobileCard = ({ member, pendingChanges, mainRoles, roles, updatingId, dele
   );
 };
 
-const ActionButtons = ({ member, hasChanges, updatingId, deleteConfirmId, handleUpdate, handleDelete, setDeleteConfirmId }) => (
+const ActionButtons = ({ member, hasChanges, updatingId, deleteConfirmId, handleUpdate, handleDelete, setDeleteConfirmId,onResetPassword }) => (
   <div className="flex justify-end items-center gap-2">
+    {/* --- New Reset Password Button --- */}
+    <button 
+      onClick={onResetPassword}
+      className="p-2.5 text-gray-500 hover:text-amber-500 hover:bg-amber-500/10 rounded-lg transition-all"
+      title="Reset Password"
+    >
+      <Key size={14} />
+    </button>
     {hasChanges && (
       <button 
         onClick={() => handleUpdate(member)}

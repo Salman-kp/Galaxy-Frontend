@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Trash2, Check, Shield, Fingerprint, Loader2, Edit3, X, Save } from "lucide-react";
+import { Plus, Check, Shield, Fingerprint, Loader2, Edit3, X, Save } from "lucide-react";
 import api from "../../../services/api";
 import { toast } from "react-hot-toast";
 

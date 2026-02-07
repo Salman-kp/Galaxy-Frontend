@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
-import { Loader2, Briefcase, CheckCircle2 } from "lucide-react";
+import { Loader2, Briefcase } from "lucide-react";
 import EventCard from "../../components/workers/EventCard";
 
 export default function WorkersCompletedEvents() {

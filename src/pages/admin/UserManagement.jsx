@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { 
   UserPlus, Search, Key, Trash2, SlidersHorizontal, 
   ChevronLeft, ChevronRight, UserPen, Ban, CheckCircle, 
-  XCircle, Users, Layers
+  XCircle, Users
 } from "lucide-react";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext"; // Import useAuth
@@ -45,10 +45,13 @@ export default function UserManagement() {
       const data = res.data || [];
       setUsers(data);
       
-      const maxPage = Math.ceil(data.length / usersPerPage);
-      if (currentPage > maxPage && maxPage > 0) {
-        setCurrentPage(maxPage);
-      }
+    const nonAdminUsers = data.filter(user => user.role !== 'admin');
+    setUsers(nonAdminUsers);
+    
+    const maxPage = Math.ceil(nonAdminUsers.length / usersPerPage);
+    if (currentPage > maxPage && maxPage > 0) {
+      setCurrentPage(maxPage);
+    }
     } catch (err) { 
       triggerNotify("Failed to sync user data with server", "error");
     }
@@ -137,7 +140,6 @@ export default function UserManagement() {
                 className="bg-transparent text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer pr-2 text-gray-400"
               >
                 <option value="all">ALL ROLES</option>
-                <option value="admin">ADMIN</option>
                 <option value="captain">CAPTAIN</option>
                 <option value="sub_captain">SUB CAPTAIN</option>
                 <option value="main_boy">MAIN BOY</option>
