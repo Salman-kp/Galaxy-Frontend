@@ -152,7 +152,7 @@ export default function UserFormDrawer({
                 />
               ) : userData?.photo ? (
                 <img
-                  src={`http://localhost:8080/uploads/${userData.photo}`}
+                  src={`${import.meta.env.VITE_IMAGE_URL}/uploads/${userData.photo}`}
                   className="h-full w-full object-cover opacity-80"
                   alt="profile"
                   onError={(e) => {

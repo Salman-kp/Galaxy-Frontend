@@ -7,7 +7,6 @@ import {
   Droplets,
   Calendar,
   Briefcase,
-  User,
   Wallet,
 } from "lucide-react";
 
@@ -56,7 +55,7 @@ export default function CaptainProfile() {
             <img
               src={
                 profile.photo
-                  ? `http://localhost:8080/uploads/${profile.photo}`
+                  ? `${import.meta.env.VITE_IMAGE_URL}/uploads/${profile.photo}`
                   : `https://ui-avatars.com/api/?name=${profile.name}&background=000&color=fff`
               }
               alt="Profile"
@@ -132,7 +131,7 @@ function InfoItem({ icon: Icon, label, value }) {
           {label}
         </p>
         <p className="text-sm font-black text-gray-800 capitalize">
-          {value }
+          {value}
         </p>
       </div>
     </div>

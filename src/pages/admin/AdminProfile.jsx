@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import api from "../../services/api";
-import { 
-   Phone, MapPin, Droplets, Calendar, 
-  Building2, ShieldCheck, Loader2, 
+import {
+  Phone, MapPin, Droplets, Calendar,
+  Building2, ShieldCheck, Loader2,
   Key
 } from "lucide-react";
 import UpdateProfileForm from "../../components/admin/UpdateProfileForm";
@@ -47,10 +47,10 @@ export default function AdminProfile() {
   return (
     <div className="min-h-screen bg-[#0a0a0c] text-white p-4 lg:p-8 font-sans">
       <div className="max-w-4xl mx-auto">
-        
+
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-8">
           <div>
-             <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white uppercase">Profile</h1>
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white uppercase">Profile</h1>
             <p className="text-xs text-gray-500">Manage identity and credentials.</p>
           </div>
         </div>
@@ -59,8 +59,8 @@ export default function AdminProfile() {
           <div className="p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
             <div className="relative group">
               <div className="relative">
-                <img 
-                  src={profile.photo ? `http://localhost:8080/uploads/${profile.photo}` : "https://ui-avatars.com/api/?background=1d1d21&color=fff&name=" + profile.name} 
+                <img
+                  src={profile.photo ? `${import.meta.env.VITE_IMAGE_URL}/uploads/${profile.photo}` : "https://ui-avatars.com/api/?background=1d1d21&color=fff&name=" + profile.name}
                   className="w-28 h-28 rounded-xl object-cover grayscale-[0.3] border border-white/10"
                   alt="Admin"
                 />
@@ -84,13 +84,13 @@ export default function AdminProfile() {
                   <MapPin size={13} className="text-blue-500" /> {profile.starting_point || "Undisclosed"}
                 </p>
                 {hasPermission("profile:edit") && (
-                <button 
-                onClick={() => setShowUpdate(true)}
-                className="flex items-center gap-2 bg-blue-600 text-black hover:bg-gray-200 px-2 py-2 rounded-full text-xs font-bold transition-all active:scale-95"
-               >
-                <Key size={14} /> 
-               </button>
-               )}
+                  <button
+                    onClick={() => setShowUpdate(true)}
+                    className="flex items-center gap-2 bg-blue-600 text-black hover:bg-gray-200 px-2 py-2 rounded-full text-xs font-bold transition-all active:scale-95"
+                  >
+                    <Key size={14} />
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -107,9 +107,9 @@ export default function AdminProfile() {
       </div>
 
       {showUpdate && (
-        <UpdateProfileForm 
-          currentData={profile} 
-          onClose={() => setShowUpdate(false)} 
+        <UpdateProfileForm
+          currentData={profile}
+          onClose={() => setShowUpdate(false)}
           onRefresh={fetchProfile}
         />
       )}

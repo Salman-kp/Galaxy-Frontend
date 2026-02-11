@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { 
-  UserPlus, Search, Key, Trash2, SlidersHorizontal, 
-  ChevronLeft, ChevronRight, UserPen, Ban, CheckCircle, 
+import {
+  UserPlus, Search, Key, Trash2, SlidersHorizontal,
+  ChevronLeft, ChevronRight, UserPen, Ban, CheckCircle,
   XCircle, Users
 } from "lucide-react";
 import api from "../../services/api";
@@ -28,12 +28,12 @@ export default function UserManagement() {
     setTimeout(() => setNotification(prev => ({ ...prev, show: false })), 4000);
   };
 
-  const IMAGE_BASE_URL = "http://localhost:8080/uploads"; 
+  const IMAGE_BASE_URL = `${import.meta.env.VITE_IMAGE_URL}/uploads`
 
   const fetchUsers = useCallback(async () => {
     // Only fetch if user has view permission
     if (!hasPermission("user:view")) return;
-    
+
     try {
       let url = "/admin/users";
       if (searchTerm) {
@@ -44,15 +44,15 @@ export default function UserManagement() {
       const res = await api.get(url);
       const data = res.data || [];
       setUsers(data);
-      
-    const nonAdminUsers = data.filter(user => user.role !== 'admin');
-    setUsers(nonAdminUsers);
-    
-    const maxPage = Math.ceil(nonAdminUsers.length / usersPerPage);
-    if (currentPage > maxPage && maxPage > 0) {
-      setCurrentPage(maxPage);
-    }
-    } catch (err) { 
+
+      const filteredUsers = data.filter(user => user.role !== "admin");
+      setUsers(filteredUsers);
+
+      const maxPage = Math.ceil(filteredUsers.length / usersPerPage);
+      if (currentPage > maxPage && maxPage > 0) {
+        setCurrentPage(maxPage);
+      }
+    } catch (err) {
       triggerNotify("Failed to sync user data with server", "error");
     }
   }, [searchTerm, selectedRole, currentPage, hasPermission]); // Added hasPermission to dependency array
@@ -65,8 +65,8 @@ export default function UserManagement() {
       await api.put(`/admin/users/${action}/${user.id}`);
       triggerNotify(`User access ${action === 'block' ? 'suspended' : 'restored'}`);
       fetchUsers();
-    } catch (err) { 
-      triggerNotify("System error: Could not update status", "error"); 
+    } catch (err) {
+      triggerNotify("System error: Could not update status", "error");
     }
   };
 
@@ -76,7 +76,7 @@ export default function UserManagement() {
       setConfirmDeleteId(null);
       triggerNotify("Staff record permanently deleted");
       fetchUsers();
-    } catch (err) { 
+    } catch (err) {
       triggerNotify("Delete operation failed", "error");
       setConfirmDeleteId(null);
     }
@@ -103,13 +103,12 @@ export default function UserManagement() {
   return (
     <div className="min-h-screen bg-[#0a0a0c] text-white pt-[72px] p-4 md:p-6 lg:p-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-8">
-        
+
         {/* NOTIFICATION */}
         {notification.show && (
           <div className="fixed top-20 right-4 md:right-8 z-[9999] animate-in slide-in-from-right-full duration-300">
-            <div className={`flex items-center gap-4 px-6 py-4 rounded-2xl shadow-2xl border backdrop-blur-md ${
-              notification.type === "success" ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-rose-500/10 border-rose-500/20 text-rose-400"
-            }`}>
+            <div className={`flex items-center gap-4 px-6 py-4 rounded-2xl shadow-2xl border backdrop-blur-md ${notification.type === "success" ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-rose-500/10 border-rose-500/20 text-rose-400"
+              }`}>
               {notification.type === "success" ? <CheckCircle size={18} /> : <XCircle size={18} />}
               <p className="text-[10px] font-black uppercase tracking-widest">{notification.message}</p>
             </div>
@@ -126,16 +125,16 @@ export default function UserManagement() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
             <div className="relative group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-blue-500 transition-colors" size={14} />
-              <input 
+              <input
                 type="text" placeholder="SEARCH PHONE..." value={searchTerm}
-                onChange={(e) =>{ setSearchTerm(e.target.value); setCurrentPage(1); }}
+                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                 className="pl-10 pr-4 py-2 bg-[#111114] border border-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest outline-none w-full sm:w-48 focus:border-blue-500/50 transition-all placeholder:text-gray-700"
               />
             </div>
 
             <div className="flex items-center gap-2 bg-[#111114] border border-white/5 px-3 py-2 rounded-xl">
               <SlidersHorizontal size={14} className="text-gray-500" />
-              <select 
+              <select
                 value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}
                 className="bg-transparent text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer pr-2 text-gray-400"
               >
@@ -149,7 +148,7 @@ export default function UserManagement() {
 
             {/* Check user:create permission */}
             {hasPermission("user:create") && (
-              <button 
+              <button
                 onClick={() => { setEditingUser(null); setIsDrawerOpen(true); }}
                 className="bg-blue-600 hover:bg-blue-500 text-black px-6 py-2 rounded-full flex justify-center items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg"
               >
@@ -170,7 +169,7 @@ export default function UserManagement() {
               {users.length} Nodes Detected
             </span>
           </div>
-          
+
           {/* DESKTOP VIEW */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -193,11 +192,11 @@ export default function UserManagement() {
                     </td>
                     <td className="px-6 py-5">
                       <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 overflow-hidden">
-                        <img 
-                          src={`${IMAGE_BASE_URL}/${user.photo}`} 
-                          className="h-full w-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" 
-                          alt="" 
-                          onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random&color=fff`; }} 
+                        <img
+                          src={`${IMAGE_BASE_URL}/${user.photo}`}
+                          className="h-full w-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                          alt=""
+                          onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random&color=fff`; }}
                         />
                       </div>
                     </td>
@@ -211,9 +210,8 @@ export default function UserManagement() {
                       </span>
                     </td>
                     <td className="px-6 py-5 text-center">
-                      <span className={`px-2 py-1 rounded text-[8px] font-black uppercase tracking-[0.15em] border ${
-                        user.status === 'active' ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border-rose-500/20'
-                      }`}>
+                      <span className={`px-2 py-1 rounded text-[8px] font-black uppercase tracking-[0.15em] border ${user.status === 'active' ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border-rose-500/20'
+                        }`}>
                         {user.status}
                       </span>
                     </td>
@@ -221,11 +219,11 @@ export default function UserManagement() {
                       <span className="text-xs font-black text-gray-400">{user.completed_work || 0}</span>
                     </td>
                     <td className="px-6 py-5 text-right">
-                      <ActionButtons 
-                        user={user} 
-                        confirmDeleteId={confirmDeleteId} 
-                        setConfirmDeleteId={setConfirmDeleteId} 
-                        handleDelete={handleDelete} 
+                      <ActionButtons
+                        user={user}
+                        confirmDeleteId={confirmDeleteId}
+                        setConfirmDeleteId={setConfirmDeleteId}
+                        handleDelete={handleDelete}
                         setResetPwdId={setResetPwdId}
                         handleBlockToggle={handleBlockToggle}
                         setEditingUser={setEditingUser}
@@ -253,9 +251,8 @@ export default function UserManagement() {
                       <p className="text-[10px] text-gray-500 font-bold">{user.phone}</p>
                     </div>
                   </div>
-                  <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border ${
-                    user.status === 'active' ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border-rose-500/20'
-                  }`}>
+                  <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border ${user.status === 'active' ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' : 'text-rose-500 bg-rose-500/10 border-rose-500/20'
+                    }`}>
                     {user.status}
                   </span>
                 </div>
@@ -272,18 +269,18 @@ export default function UserManagement() {
                 </div>
 
                 <div className="flex justify-end gap-2">
-                   <ActionButtons 
-                        user={user} 
-                        confirmDeleteId={confirmDeleteId} 
-                        setConfirmDeleteId={setConfirmDeleteId} 
-                        handleDelete={handleDelete} 
-                        setResetPwdId={setResetPwdId}
-                        handleBlockToggle={handleBlockToggle}
-                        setEditingUser={setEditingUser}
-                        setIsDrawerOpen={setIsDrawerOpen}
-                        isMobile={true}
-                        hasPermission={hasPermission} // Pass permission checker
-                      />
+                  <ActionButtons
+                    user={user}
+                    confirmDeleteId={confirmDeleteId}
+                    setConfirmDeleteId={setConfirmDeleteId}
+                    handleDelete={handleDelete}
+                    setResetPwdId={setResetPwdId}
+                    handleBlockToggle={handleBlockToggle}
+                    setEditingUser={setEditingUser}
+                    setIsDrawerOpen={setIsDrawerOpen}
+                    isMobile={true}
+                    hasPermission={hasPermission} // Pass permission checker
+                  />
                 </div>
               </div>
             ))}
@@ -295,16 +292,16 @@ export default function UserManagement() {
               Entries {indexOfFirstUser + 1}—{Math.min(indexOfLastUser, users.length)} / {users.length}
             </p>
             <div className="flex gap-2">
-              <button 
-                disabled={currentPage === 1} 
-                onClick={() => setCurrentPage(prev => prev - 1)} 
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => prev - 1)}
                 className="p-2 rounded-lg border border-white/10 bg-white/5 disabled:opacity-20 text-gray-400 hover:text-white transition-all"
               >
                 <ChevronLeft size={18} />
               </button>
-              <button 
-                disabled={currentPage >= totalPages} 
-                onClick={() => setCurrentPage(prev => prev + 1)} 
+              <button
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage(prev => prev + 1)}
                 className="p-2 rounded-lg border border-white/10 bg-white/5 disabled:opacity-20 text-gray-400 hover:text-white transition-all"
               >
                 <ChevronRight size={18} />
@@ -315,16 +312,16 @@ export default function UserManagement() {
 
         {/* MODALS */}
         <div className="relative z-[50]">
-          <UserFormDrawer 
-            isOpen={isDrawerOpen} 
-            onClose={() => setIsDrawerOpen(false)} 
-            userData={editingUser} 
-            onSuccess={() => { fetchUsers(); triggerNotify(editingUser ? "User updated" : "User created"); }} 
-            onError={(msg) => triggerNotify(msg, "error")} 
+          <UserFormDrawer
+            isOpen={isDrawerOpen}
+            onClose={() => setIsDrawerOpen(false)}
+            userData={editingUser}
+            onSuccess={() => { fetchUsers(); triggerNotify(editingUser ? "User updated" : "User created"); }}
+            onError={(msg) => triggerNotify(msg, "error")}
           />
-          <ResetPasswordModal 
-            userId={resetPwdId} 
-            onClose={() => setResetPwdId(null)} 
+          <ResetPasswordModal
+            userId={resetPwdId}
+            onClose={() => setResetPwdId(null)}
             onSuccess={() => triggerNotify("Credentials reset successfully")}
             onError={(msg) => triggerNotify(msg, "error")}
           />
@@ -349,12 +346,12 @@ function ActionButtons({ user, confirmDeleteId, setConfirmDeleteId, handleDelete
     <div className={`flex items-center gap-1 ${!isMobile && 'justify-end md:opacity-0 group-hover:opacity-100 transition-opacity'}`}>
       {/* user:password */}
       {hasPermission("user:password") && (
-        <button onClick={() => setResetPwdId(user.id)} title="Reset Password" 
+        <button onClick={() => setResetPwdId(user.id)} title="Reset Password"
           className="p-2 text-gray-500 hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition-all">
           <Key size={14} />
         </button>
       )}
-      
+
       {/* user:edit */}
       {hasPermission("user:edit") && (
         <button onClick={() => { setEditingUser(user); setIsDrawerOpen(true); }} title="Edit User"
