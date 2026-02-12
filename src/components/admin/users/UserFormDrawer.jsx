@@ -90,7 +90,7 @@ export default function UserFormDrawer({
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
-        await api.post("/admin/users", data, {
+        await api.post("/admin/users/", data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }

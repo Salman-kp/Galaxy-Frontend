@@ -35,7 +35,7 @@ export default function UserManagement() {
     if (!hasPermission("user:view")) return;
 
     try {
-      let url = "/admin/users";
+      let url = "/admin/users/";
       if (searchTerm) {
         url = `/admin/users/search?phone=${searchTerm}`;
       } else if (selectedRole !== "all") {

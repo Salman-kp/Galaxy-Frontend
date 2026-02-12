@@ -77,7 +77,7 @@ export default function EventFormDrawer({ isOpen, onClose, onRefresh, editData =
         response = await api.put(`/admin/events/${editData.id}`, payload);
         toast.success(response.data?.message || "Event updated successfully");
       } else {
-        response = await api.post("/admin/events", payload);
+        response = await api.post("/admin/events/", payload);
         toast.success(response.data?.message || "Event created successfully");
       }
       

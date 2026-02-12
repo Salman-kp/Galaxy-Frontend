@@ -56,7 +56,7 @@ export default function EventManagement() {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("/admin/events");
+      const { data } = await api.get("/admin/events/");
       const sortedData = (data || []).sort((a, b) => new Date(b.date) - new Date(a.date));
       setEvents(sortedData);
     } catch (err) {
