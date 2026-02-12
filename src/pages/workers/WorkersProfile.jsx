@@ -73,7 +73,7 @@ export default function WorkersProfile() {
             {profile.role}
           </p>
           <p className="text-xs font-semibold text-gray-400 mt-1">
-            Captain ID: {profile.id}
+            ID: {profile.id}
           </p>
         </div>
 
