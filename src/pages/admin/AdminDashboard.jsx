@@ -31,7 +31,7 @@ export default function AdminDashboard() {
   const fetchTodayEvents = async () => {
     setLoadingToday(true);
     try {
-      const { data } = await api.get("/admin/events");
+      const { data } = await api.get("/admin/events/");
       setAllEvents(data || []);
     } catch (err) {
       console.error("Failed to fetch events for dashboard");
