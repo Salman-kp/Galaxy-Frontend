@@ -31,7 +31,7 @@ export default function TeamAccessTab({ roles }) {
   const fetchStaff = async (roleType) => {
     setLoading(true);
     try {
-      let url = roleType === "all" ? "/admin/users" : `/admin/users/role/${roleType}`;
+      let url = roleType === "all" ? "/admin/users/" : `/admin/users/role/${roleType}`;
       const { data } = await api.get(url);
       setStaff(data || []);
       setPendingChanges({}); 
